@@ -564,7 +564,7 @@ def main():
             no_split = st.checkbox("Disable splitting of touching particles")
         with st.expander("Sample"):
             volume = st.number_input("Filtered water volume (L, optional)", 0.0, 1000.0, 0.0)
-        st.link_button("Open live app", APP_URL, use_container_width=True)
+        st.link_button("Use our other tools", APP_URL, use_container_width=True)
 
     up = st.file_uploader("Microscope image", type=["png", "jpg", "jpeg", "tif", "tiff"])
     if up is None:
