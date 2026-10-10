@@ -469,6 +469,20 @@ html, body, .stApp,
 /* Hidden helper frame that enables open-on-hover */
 .stApp [data-testid="stElementContainer"]:has(> iframe[height="0"]) { display: none; }
 
+/* Link button styled as one more menu row */
+.stApp [data-testid="stSidebar"] [data-testid^="stBaseLinkButton"] {
+    justify-content: flex-start; background: transparent; border: none; border-radius: 0;
+    border-bottom: 1px solid rgba(58, 61, 36, 0.22); padding: 0.85rem 0.25rem;
+    border-left: 2px solid transparent; color: %TEXT%;
+    transition: padding-left 0.15s ease, border-color 0.15s ease;
+}
+.stApp [data-testid="stSidebar"] [data-testid^="stBaseLinkButton"] * { color: %TEXT%; font-size: 1.05rem; }
+.stApp [data-testid="stSidebar"] [data-testid^="stBaseLinkButton"]:hover,
+.stApp [data-testid="stSidebar"] [data-testid^="stBaseLinkButton"]:focus-visible {
+    padding-left: 0.65rem; border-left-color: %OLIVE%; background: transparent;
+}
+.stApp [data-testid="stSidebar"] [data-testid^="stBaseLinkButton"]:hover * { color: %OLIVE_DARK%; }
+
 @media (prefers-reduced-motion: reduce) {
     .stApp [data-testid="stSidebar"] [data-testid="stExpander"] summary { transition: none; }
 }
@@ -478,6 +492,8 @@ for _k, _v in {"%BEIGE_DARK%": BEIGE_DARK, "%BEIGE_LITE%": BEIGE_LITE, "%BEIGE%"
                "%OLIVE_DARK%": OLIVE_DARK, "%OLIVE%": OLIVE, "%TEXT%": TEXT, "%FONT%": FONT}.items():
     THEME_CSS = THEME_CSS.replace(_k, _v)
 
+
+APP_URL = "https://microplastic-countergit-d699me5vgzbug76zxaejfr.streamlit.app/"
 
 HOVER_JS = """
 <script>
@@ -548,6 +564,7 @@ def main():
             no_split = st.checkbox("Disable splitting of touching particles")
         with st.expander("Sample"):
             volume = st.number_input("Filtered water volume (L, optional)", 0.0, 1000.0, 0.0)
+        st.link_button("Open live app", APP_URL, use_container_width=True)
 
     up = st.file_uploader("Microscope image", type=["png", "jpg", "jpeg", "tif", "tiff"])
     if up is None:
