@@ -1,4 +1,4 @@
-"""Streamlit web app for the HYDROLYTICS (single file: UI + analysis).
+"""Streamlit web app for the microplastic counter (single file: UI + analysis).
 Run locally:  streamlit run app.py
 """
 import cv2
@@ -494,6 +494,7 @@ for _k, _v in {"%BEIGE_DARK%": BEIGE_DARK, "%BEIGE_LITE%": BEIGE_LITE, "%BEIGE%"
 
 
 APP_URL = "https://microplastic-countergit-d699me5vgzbug76zxaejfr.streamlit.app/"
+CHATBOT_URL = "https://h5ravyqbdamj3agrocdc4y.streamlit.app/Hydrolytics_Chatbot"
 
 HOVER_JS = """
 <script>
@@ -536,9 +537,9 @@ def rgb(img):
 
 
 def main():
-    st.set_page_config(page_title="HYDROLYTICS", layout="wide")
+    st.set_page_config(page_title="Microplastic Counter", layout="wide")
     st.markdown(THEME_CSS, unsafe_allow_html=True)
-    st.title("HYDROLYTICS")
+    st.title("Microplastic Counter")
     st.caption("Upload a microscope image to detect, size and classify particles.")
 
     components.html(HOVER_JS, height=0)
@@ -564,7 +565,8 @@ def main():
             no_split = st.checkbox("Disable splitting of touching particles")
         with st.expander("Sample"):
             volume = st.number_input("Filtered water volume (L, optional)", 0.0, 1000.0, 0.0)
-        st.link_button("Use our other tools", APP_URL, use_container_width=True)
+        st.link_button("Open live app", APP_URL, use_container_width=True)
+        st.link_button("WATA, the chatbot", CHATBOT_URL, use_container_width=True)
 
     up = st.file_uploader("Microscope image", type=["png", "jpg", "jpeg", "tif", "tiff"])
     if up is None:
