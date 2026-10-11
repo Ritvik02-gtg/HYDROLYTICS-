@@ -1,4 +1,4 @@
-"""Streamlit web app for the microplastic counter (single file: UI + analysis).
+"""Streamlit web app for the HYDROLYTICS (single file: UI + analysis).
 Run locally:  streamlit run app.py
 """
 import cv2
@@ -536,9 +536,9 @@ def rgb(img):
 
 
 def main():
-    st.set_page_config(page_title="Microplastic Counter", layout="wide")
+    st.set_page_config(page_title="HYDROLYTICS", layout="wide")
     st.markdown(THEME_CSS, unsafe_allow_html=True)
-    st.title("Microplastic Counter")
+    st.title("HYDROLYTICS")
     st.caption("Upload a microscope image to detect, size and classify particles.")
 
     components.html(HOVER_JS, height=0)
