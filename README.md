@@ -1,4 +1,4 @@
-# Microplastic Counter
+# HYDROLYTICS ( microplastic counter )
 
 A free, browser-based tool that counts, measures and classifies microplastic particles from a single photograph or microscope image of a filter or Petri dish. It needs no training data, no GPU and no coding: upload an image, adjust a few settings and read the results.
 
