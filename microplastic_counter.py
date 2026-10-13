@@ -1,22 +1,3 @@
-"""
-Microplastic counter: detect, size and classify particles in a microscope image.
-
-Typical sample prep: filter water through a membrane, stain with Nile Red,
-image under blue/UV light (particles fluoresce on a dark background).
-Also works for bright-field images of dark particles on a light filter (--mode dark).
-
-Usage:
-  python microplastic_counter.py image.png --um-per-px 2.5
-  python microplastic_counter.py image.png --um-per-px 2.5 --mode dark --min-um 20
-  python microplastic_counter.py dish.jpg --mode dark --dish     # mask outside a petri dish
-  python microplastic_counter.py --demo                           # synthetic test image
-
-Calibrate --um-per-px by imaging a stage micrometer or a ruler at the same
-magnification. Without it, results are in pixels.
-
-Outputs: <name>_annotated.png, <name>_particles.csv, <name>_summary.txt
-Needs:   opencv-python, numpy, pandas, scipy
-"""
 import argparse
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -26,18 +7,17 @@ import numpy as np
 import pandas as pd
 from scipy import ndimage as ndi
 
-SIZE_BINS_UM = [0, 20, 50, 100, 300, 1000, 5000]   # common MP size classes (um)
+SIZE_BINS_UM = [0, 20, 50, 100, 300, 1000, 5000]  
 COLORS = {"fiber": (0, 165, 255), "bead": (255, 200, 0),
           "fragment": (0, 255, 0), "film": (255, 0, 255)}
 CHANNELS = {"b": 0, "g": 1, "r": 2}
-MAX_SIDE = 2400                                     # downscale huge images (keeps calibration)
+MAX_SIDE = 2400                                    
 
 
-# ---------------------------- preprocessing ----------------------------
 def to_gray(img, channel):
     if channel == "gray":
         return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    return np.ascontiguousarray(img[:, :, CHANNELS[channel]])   # e.g. green for Nile Red
+    return np.ascontiguousarray(img[:, :, CHANNELS[channel]])   
 
 
 def detect_mode(gray):
@@ -58,7 +38,7 @@ def flatten_background(gray, mode, sigma=None):
     too large for thumbnails). Median is robust to big particles biasing the estimate."""
     if sigma is None:
         sigma = max(15, min(gray.shape) // 15)
-    f = 4 if sigma > 60 else 1                     # median on a downscaled copy: much faster
+    f = 4 if sigma > 60 else 1                     
     small = cv2.resize(gray, None, fx=1 / f, fy=1 / f, interpolation=cv2.INTER_AREA) if f > 1 else gray
     bg = cv2.medianBlur(small, min(sigma // f, 255) | 1)
     if f > 1:
@@ -112,10 +92,9 @@ def segment(signal, split_touching=True, floor=25, roi=None):
     return labels
 
 
-# ---------------------------- measurement ------------------------------
+
 def classify(aspect, circularity, solidity, thinness):
-    # Thresholds are heuristics; tune against particles you have identified by hand.
-    # thinness = perimeter^2 / area: catches curly fibers whose bounding box is square.
+   
     if aspect >= 3.5 or (thinness > 60 and solidity < 0.5):
         return "fiber"
     if circularity >= 0.87 and aspect < 1.2:
@@ -129,7 +108,7 @@ def plastic_likelihood(shape, sat, val, contrast, mode):
     """Rough visual triage, NOT identification. Saturated unnatural colours (blue, red,
     green, purple) are a common hint for synthetic fibres; brown/tan is usually organic.
     Everything still needs hot-needle / FTIR / Raman confirmation."""
-    if mode == "fluorescent":                 # Nile Red stains plastics; bright = candidate
+    if mode == "fluorescent":                
         return "likely" if contrast >= 60 else "possible"
     if sat >= 90 and val >= 60:
         return "likely"
@@ -158,13 +137,13 @@ def measure(labels, um_per_px, min_um, max_um, signal, min_contrast, img_bgr, mo
         if not cnts:
             continue
         c = max(cnts, key=cv2.contourArea)
-        c = c + np.array([[sl[1].start, sl[0].start]])          # back to full-image coords
+        c = c + np.array([[sl[1].start, sl[0].start]])         
         area = max(cv2.contourArea(c), float(area_px))
         per = cv2.arcLength(c, True)
         (cx, cy), (w, h), _ = cv2.minAreaRect(c)
         long_px, short_px = max(w, h), max(min(w, h), 1.0)
         thinness = per ** 2 / area if area else 0
-        # curly fibres: minAreaRect underestimates length; use ~half the perimeter instead
+    
         if thinness > 60:
             long_px = max(long_px, per / 2)
             short_px = max(area / long_px, 1.0)
@@ -188,7 +167,6 @@ def measure(labels, um_per_px, min_um, max_um, signal, min_contrast, img_bgr, mo
     return rows
 
 
-# ---------------------------- sanity checks ----------------------------
 def assess_image(gray, labels, mode, n_particles, roi=None):
     """Return (warnings, looks_valid). Heuristic check that the image resembles a
     sparse particle sample rather than an ordinary photo."""
@@ -219,7 +197,6 @@ def assess_image(gray, labels, mode, n_particles, roi=None):
     return warnings, not bad
 
 
-# ---------------------------- core pipeline ----------------------------
 @dataclass
 class Result:
     annotated: np.ndarray
@@ -261,7 +238,7 @@ def analyze(img_bgr, um_per_px=1.0, mode="auto", channel="g", min_um=0.0, max_um
     return Result(out, df, px_area * um_per_px ** 2 / 1e6, mode, warnings, valid)
 
 
-# ---------------------------- reporting --------------------------------
+
 def draw_legend(img):
     for i, (name, col) in enumerate(COLORS.items()):
         cv2.putText(img, name, (10, 20 + 18 * i), cv2.FONT_HERSHEY_SIMPLEX, 0.5, col, 1, cv2.LINE_AA)
@@ -305,7 +282,7 @@ def process(path, volume_L=None, **kw):
     return res.df
 
 
-# ---------------------------- demo image -------------------------------
+
 def make_demo(path, seed=1):
     """Synthetic fluorescent field: fragments, fibers, beads, uneven lighting, noise."""
     rng = np.random.default_rng(seed)
@@ -326,14 +303,13 @@ def make_demo(path, seed=1):
         cv2.circle(img, c, int(rng.integers(4, 9)), 255, -1)
     img = cv2.GaussianBlur(img, (3, 3), 0).astype(np.float32)
     xx, yy = np.meshgrid(np.linspace(0, 1, W), np.linspace(0, 1, H))
-    img += 25 + 30 * (xx * 0.7 + yy * 0.3)                  # uneven illumination
-    img += rng.normal(0, 6, img.shape)                      # sensor noise
+    img += 25 + 30 * (xx * 0.7 + yy * 0.3)                  
+    img += rng.normal(0, 6, img.shape)                     
     img = np.clip(img, 0, 255).astype(np.uint8)
-    cv2.imwrite(str(path), cv2.merge([img // 4, img, img // 3]))   # greenish fluorescence
+    cv2.imwrite(str(path), cv2.merge([img // 4, img, img // 3]))   
     return truth
 
 
-# ---------------------------- CLI --------------------------------------
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("image", nargs="?")
