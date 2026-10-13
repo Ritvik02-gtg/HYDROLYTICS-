@@ -15,7 +15,8 @@ Counting microplastics by eye under a microscope is slow and varies from person 
 
 ## Integrated tools
 
-This project brings together three sub-tools and a chatbot in one platform, the [main app](https://teamhydrolytics.streamlit.app/). They are integrated using the repositories published at [github.com/saithoshithb](https://github.com/saithoshithb).
+This project brings together three sub-tools (namely other tools ) and a chatbot (namely wata) in one platform, the [main app](https://teamhydrolytics.streamlit.app/). They are integrated using the repositories published at [github.com/saithoshithb](https://github.com/saithoshithb).
+hydrolytics tools and wata chatbot were built for the platform (https://teamhydrolytics.streamlit.app/)
 
 ## Sustainable Development Goals
 
