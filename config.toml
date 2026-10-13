@@ -1,7 +1,7 @@
 [theme]
 base = "light"
-primaryColor = "#6F7B45"              # olive (slider, radio, checkbox, links)
-backgroundColor = "#F4EEDF"           # cream
-secondaryBackgroundColor = "#E8DDC6"  # sand (sidebar, widgets)
-textColor = "#3A3D24"                 # deep olive-brown
+primaryColor = "#6F7B45"             
+backgroundColor = "#F4EEDF"           
+secondaryBackgroundColor = "#E8DDC6"  
+textColor = "#3A3D24"                 
 font = "serif"
